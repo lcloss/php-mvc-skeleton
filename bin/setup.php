@@ -19,6 +19,13 @@ if (!is_dir($storageLogs)) {
     mkdir($storageLogs, 0777, true);
 }
 
+$agentsStub = $root . '/docs/ai-guidelines/AGENTS.md.stub';
+$agentsFile = $root . '/AGENTS.md';
+if (!file_exists($agentsFile) && file_exists($agentsStub)) {
+    copy($agentsStub, $agentsFile);
+    echo "AGENTS.md criado a partir do template de guidelines para IA\n";
+}
+
 echo "Projeto pronto. Próximos passos:\n";
 echo "  1. Ajusta as variáveis em .env\n";
 echo "  2. php migrate.php\n";

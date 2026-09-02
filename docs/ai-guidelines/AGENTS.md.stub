@@ -1,0 +1,89 @@
+# AGENTS.md
+
+Este projeto usa o **php-mvc-skeleton** (`lcloss/php-mvc-skeleton`): um micro-framework MVC
+em PHP puro, sem dependências pesadas. **Não é Laravel.** Não assuma Eloquent, Artisan,
+service container, cache de config/rotas/views, ou o conjunto completo do Blade — nada disso
+existe aqui. Antes de escrever código, prefira confirmar convenções lendo os arquivos citados
+abaixo ou rodando `php bin/ai-context.php`.
+
+## Como introspectar esta aplicação
+
+```
+php bin/ai-context.php routes          # lista as rotas registradas
+php bin/ai-context.php schema          # lista tabelas/colunas do banco atual
+php bin/ai-context.php info            # versão do PHP, driver de banco, middlewares, etc.
+php bin/ai-context.php all             # os três juntos
+php bin/ai-context.php all --json      # saída JSON, para parsing programático
+```
+
+Use esses comandos em vez de adivinhar rotas ou schema — eles refletem o estado real do
+projeto, não um snapshot deste arquivo.
+
+## Rotas
+
+Definidas em `config/routes.php` como um array PHP estático (sem grupos, sem cache):
+
+```php
+[
+    'method' => 'GET',
+    'path' => '/posts/{id}',
+    'handler' => 'app\controllers\PostController@show',
+    'middlewares' => ['auth'],
+],
+```
+
+`{param}` em `path` é passado ao método do controller na ordem dos parâmetros (via reflection).
+O dispatch acontece em `lib/Router.php`.
+
+## Controllers
+
+Em `app/controllers/`, namespace `app\controllers`, estendendo `Controller.php`. Sem injeção de
+dependência automática — o que o construtor/método pedir tem que existir explicitamente.
+
+## Models
+
+Em `app/models/`, estendendo `app\models\Model`. **Não é um query builder nem ActiveRecord
+completo** — é um wrapper PDO simples com apenas:
+
+- `create($data)`, `find($id)`, `all()`, `update($id, $data)`, `delete($id)`
+
+Sem relacionamentos, sem scopes, sem eager loading, sem query builder fluente. Para consultas
+mais complexas, use `Database::executePrepare($sql, $params)` diretamente.
+
+## Views (Blade-subset)
+
+`lib/Blade.php` é um compilador próprio, um SUBCONJUNTO do Blade real. **Suportado:**
+`@extends`, `@section`/`@yield`, `@include`, `@if`/`@else`/`@endif`, `@foreach`/`@endforeach`,
+`{{ $var }}`, `{!! $raw !!}`, `@asset`, `@csrf`.
+
+**NÃO existe:** `@auth`/`@guest`, componentes/slots, `@php`, diretivas customizadas, cache de
+views compiladas, `@switch`, `@while`. Não gere sintaxe Blade fora dessa lista — ela vai
+aparecer como texto literal na página em vez de ser processada.
+
+## Banco de dados
+
+`lib/Database.php` é um wrapper PDO estático, com suporte a `sqlite`, `mysql` e `pgsql`
+(driver definido em `.env` → `DB_CONNECTION`). Migrations ficam em `app/migrations/*.php`,
+um arquivo por migration, executadas em ordem alfabética por `migrate.php`:
+
+```
+php migrate.php
+```
+
+Cada arquivo de migration retorna um array indexado por driver (`sqlite`/`mysql`/`pgsql`)
+contendo o(s) `CREATE TABLE` correspondente(s) — veja
+`app/migrations/20260101_000000_create_example.php.example` como referência.
+
+## Configuração / ambiente
+
+`.env` (não versionado) + helper `env('CHAVE', 'default')`, implementado em `lib/Env.php`.
+Sem cache de configuração — `config/*.php` é lido diretamente a cada requisição.
+
+## Testes
+
+Pest (`pestphp/pest`), testes em `tests/Feature/`. Bootstrap em `tests/Pest.php` configura
+`DB_CONNECTION=sqlite` com `DB_DATABASE=:memory:` e roda `migrate.php` antes da suíte.
+
+```
+composer test
+```
