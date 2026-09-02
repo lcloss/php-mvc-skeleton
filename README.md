@@ -19,7 +19,7 @@ cd meu-novo-projeto
 php -S localhost:8000 -t public
 ```
 
-O `composer create-project` corre automaticamente `bin/setup.php`, que cria o `.env` a partir do `.env.example`.
+O `composer create-project` corre automaticamente `bin/setup.php`, que cria o `.env` a partir do `.env.example` e gera um `AGENTS.md` com as convenções da framework (ver secção abaixo).
 
 ## Desenvolvimento local (a partir deste repositório)
 
@@ -63,6 +63,27 @@ Definidas em `config/routes.php`:
     'middlewares' => ['auth'],
 ],
 ```
+
+## Suporte para agentes de IA
+
+Todo novo projeto criado via `composer create-project` já sai com um `AGENTS.md` na raiz
+(gerado por `bin/setup.php` a partir de `docs/ai-guidelines/AGENTS.md.stub`), documentando as
+convenções da framework e como evitar assumir recursos que ela não tem (Eloquent, Artisan,
+Blade completo, etc.).
+
+Além disso, `bin/ai-context.php` faz introspecção ao vivo do projeto — útil para um agente
+confirmar rotas e schema reais em vez de adivinhar:
+
+```bash
+php bin/ai-context.php routes          # rotas registadas em config/routes.php
+php bin/ai-context.php schema          # tabelas/colunas do banco atual
+php bin/ai-context.php info            # versão do PHP, driver de BD, middlewares, etc.
+php bin/ai-context.php all --json      # tudo junto, em JSON
+```
+
+Esta framework não inclui um servidor MCP — um agente como o Claude Code já consegue correr
+comandos de shell, e `bin/ai-context.php --json` cobre o mesmo caso de uso sem exigir um
+processo persistente nem dependências novas.
 
 ## Publicar no Packagist
 
