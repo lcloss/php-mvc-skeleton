@@ -1,0 +1,26 @@
+<?php
+// Exemplo de migração. Renomeia para remover ".example" e o `migrate.php` irá processá-la
+// na próxima execução (a ordem de execução segue a ordenação alfabética do nome do ficheiro).
+return [
+    'sqlite' => [
+        "CREATE TABLE `examples` (
+          `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          `name` VARCHAR(255) NOT NULL,
+          `created_at` DATETIME DEFAULT current_timestamp
+        );",
+    ],
+    'mysql' => [
+        "CREATE TABLE `examples` (
+          `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+          `name` VARCHAR(255) NOT NULL,
+          `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+    ],
+    'pgsql' => [
+        "CREATE TABLE examples (
+          id SERIAL PRIMARY KEY NOT NULL,
+          name VARCHAR(255) NOT NULL,
+          created_at TIMESTAMP DEFAULT current_timestamp
+        );",
+    ],
+];

@@ -1,0 +1,12 @@
+vendor/
+node_modules/
+.env
+.env.local
+.env.*.local
+.idea
+.vscode
+/.claude
+/.cursor
+storage/logs/*
+!storage/logs/.gitkeep
+*.sqlite

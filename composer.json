@@ -1,0 +1,36 @@
+{
+  "name": "lcloss/php-mvc-skeleton",
+  "description": "Framework PHP simples, sem dependências pesadas, para páginas e pequenos sites. Skeleton para `composer create-project`.",
+  "license": "MIT",
+  "type": "project",
+  "keywords": ["framework", "skeleton", "mvc", "micro-framework", "blade", "php"],
+  "require": {
+    "php": ">=8.4",
+    "phpmailer/phpmailer": "^7.0"
+  },
+  "require-dev": {
+    "pestphp/pest": "^3.0"
+  },
+  "scripts": {
+    "test": "pest",
+    "post-create-project-cmd": [
+      "php bin/setup.php"
+    ]
+  },
+  "autoload": {
+    "psr-4": {
+      "app\\": "app/"
+    },
+    "files": [
+      "lib/Autoloader.php",
+      "lib/Env.php",
+      "lib/Database.php",
+      "lib/Blade.php"
+    ]
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
